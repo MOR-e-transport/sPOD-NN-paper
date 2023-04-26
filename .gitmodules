@@ -1,6 +1,6 @@
 [submodule "sPOD"]
 	path = sPOD
-	url = https://github.com/Philipp137/sPOD.git
+	url = https://github.com/MOR-e-transport/sPOD.git
 [submodule "DL-ROM"]
 	path = DL-ROM
 	url = https://github.com/shubhadityaburela/DL-ROM.git
