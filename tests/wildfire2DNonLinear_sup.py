@@ -254,7 +254,7 @@ class wildfire2DNonLinear_sup:
                 subfig_t.supylabel(r"space $y$")
                 subfig_t.supxlabel(r"space $x$")
 
-                fig.savefig(immpath + str(var_name) + "-" + str(n), dpi=800, transparent=True)
+                fig.savefig(immpath + str(var_name) + "-" + str(n), dpi=200, transparent=True)
                 plt.close(fig)
 
     def plot_online_data(self, frame_amplitude_predicted_sPOD, frame_amplitude_predicted_POD,
@@ -513,7 +513,7 @@ class wildfire2DNonLinear_sup:
         subfig_b.supylabel(r"$T$")
         subfig_b.supxlabel(r"space $x$")
 
-        fig.savefig(impath + str(var_name) + "-mixed", dpi=600, transparent=True)
+        fig.savefig(impath + str(var_name) + "-mixed", dpi=300, transparent=True)
         plt.close(fig)
 
 

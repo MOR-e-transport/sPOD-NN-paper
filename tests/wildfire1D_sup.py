@@ -292,7 +292,7 @@ class wildfire1D_sup:
         q2_pred = U_list[1] @ time_amplitudes_2_pred
         q3_pred = U_list[2] @ time_amplitudes_3_pred
 
-        Q_recon_sPOD = np.zeros_like(q1_pred)
+        Q_recon_sPOD = 0
         NumFrames = 3
         Q_pred = [np.reshape(q1_pred, newshape=data_shape),
                   np.reshape(q2_pred, newshape=data_shape),
@@ -460,7 +460,7 @@ def plot_pred_comb(time_amplitudes_1_pred, time_amplitudes_1_test, time_amplitud
     axs[1, 0].plot(t, shifts_1_pred.flatten()[:Nt], color="red", linestyle='--', label='sPOD-NN')
     axs[1, 0].plot(t, delta_pred_frame_wise[0][:Nt], color="blue", linestyle='--', label='sPOD-I')
     axs[1, 0].set_xticks([0, t[-1] / 2, t[-1]])
-    axs[1, 0].set_ylabel(r"space $x$")
+    axs[1, 0].set_ylabel(r"shifts $\underline{\Delta}^k$")
     # axs[1, 0].set_title(r"$\Delta$")
     axs[1, 0].set_xticklabels([r"$0s$", r"$1000s$", r"$2000s$"])
     axs[1, 0].set_xlabel(r"(c)")
@@ -481,7 +481,7 @@ def plot_pred_comb(time_amplitudes_1_pred, time_amplitudes_1_test, time_amplitud
     axs[2, 0].plot(t, TA_POD_TEST[0, :], color="green", linestyle='-', label='actual')
     axs[2, 0].plot(t, POD_frame_amplitudes_predicted[0, :], color="black", linestyle='--', label='POD-NN')
     axs[2, 0].set_xticks([0, t[-1] / 2, t[-1]])
-    axs[2, 0].set_ylabel(r"$a_i^{k}(t,\mu)$")
+    axs[2, 0].set_ylabel(r"$a_i(t,\mu)$")
     axs[2, 0].set_xticklabels(["0s", r"$1000s$", r"$2000s$"])
     axs[2, 0].legend(loc='lower right')
     axs[2, 0].set_xlabel(r"(e)")
@@ -497,7 +497,7 @@ def plot_pred_comb(time_amplitudes_1_pred, time_amplitudes_1_test, time_amplitud
 
     fig.supxlabel(r"time $t$")
     save_fig(filepath=impath + "all_comb_pred", figure=fig)
-    fig.savefig(impath + "all_comb_pred" + ".eps", format='eps', dpi=600, transparent=True)
+    fig.savefig(impath + "all_comb_pred" + ".pdf", format='pdf', dpi=200, transparent=True, bbox_inches="tight")
 
 
 def plot_recons_snapshot_cross_section(q_test, Q_recon_interp, Q_recon_sPOD, Q_recon_POD, x, t):
@@ -583,4 +583,4 @@ def plot_recons_snapshot_cross_section(q_test, Q_recon_interp, Q_recon_sPOD, Q_r
     subfig_b.supylabel(r"$T$")
     subfig_b.supxlabel(r"space $x$")
 
-    fig.savefig(impath + "T_x_cross_section" + ".png", dpi=800, transparent=True)
+    fig.savefig(impath + "T_x_cross_section" + ".png", dpi=300, transparent=True)

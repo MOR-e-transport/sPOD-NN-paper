@@ -48,7 +48,7 @@ def save_fig(filepath, figure=None, **kwargs):
     ## get figure handle
     if figure is None:
         figure = plt.gcf()
-    figure.savefig(fpath + ".png", dpi=800, transparent=True)
+    figure.savefig(fpath + ".png", dpi=200, transparent=True)
     tikzplotlib.save(
         figure=figure,
         filepath=fpath + ".tex",

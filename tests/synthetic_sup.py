@@ -329,7 +329,7 @@ class synthetic_sup:
         fig.subplots_adjust(right=0.8)
         cbar_ax = fig.add_axes([0.83, 0.25, 0.01, 0.5])
         fig.colorbar(im, cax=cbar_ax)
-        fig.savefig(impath + "synthetic_" + "training" + '.png', dpi=800, transparent=True)
+        fig.savefig(impath + "synthetic_" + "training" + '.png', dpi=300, transparent=True)
 
     def plot_sPODframes(self, q_train, qtilde, q1_spod_frame, q2_spod_frame):
         qmin = np.min(q_train)
@@ -368,7 +368,7 @@ class synthetic_sup:
         fig.supxlabel(r"time $t$")
         fig.supylabel(r"space $x$")
 
-        fig.savefig(impath + "synthetic_spod_frames" + ".png", dpi=800, transparent=True)
+        fig.savefig(impath + "synthetic_spod_frames" + ".png", dpi=300, transparent=True)
 
     def plot_timeamplitudes_shifts_Pred(self, TA_sPOD_pred_1, TA_test_1, TA_sPOD_pred_2,
                                         TA_test_2, TA_POD_pred, TA_interp, shifts_sPOD_pred_1,
@@ -436,11 +436,11 @@ class synthetic_sup:
         ax5.legend(loc='lower left')
 
         subfig_b.supxlabel(r"time $t$")
-        subfig_b.supylabel(r"space $x$")
+        subfig_b.supylabel(r"shifts $\underline{\Delta}^k$")
 
-        save_fig(filepath=impath + "time_amplitudes_shifts_newplot_" + "predicted", figure=fig)
-        fig.savefig(impath + "time_amplitudes_shifts_newplot_predicted" + ".eps", format='eps',
-                    dpi=600, transparent=True)
+        save_fig(filepath=impath + "time_amplitudes_shifts_newplot_predicted", figure=fig)
+        fig.savefig(impath + "time_amplitudes_shifts_newplot_predicted" + ".pdf", format='pdf',
+                    dpi=200, transparent=True, bbox_inches="tight")
 
     def plot_recons_snapshot(self, q_sPOD_recon, q_POD_recon, q_interp):
         qmin = np.min(self.q_test)
@@ -483,4 +483,4 @@ class synthetic_sup:
         fig.supxlabel(r"time $t$")
         fig.supylabel(r"space $x$")
 
-        fig.savefig(impath + "Snapshot_Comparison" + ".png", dpi=800, transparent=True)
+        fig.savefig(impath + "Snapshot_Comparison" + ".png", dpi=300, transparent=True)

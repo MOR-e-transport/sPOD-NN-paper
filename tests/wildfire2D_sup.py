@@ -238,7 +238,7 @@ class wildfire2D_sup:
                 subfig_t.supylabel(r"space $y$")
                 subfig_t.supxlabel(r"space $x$")
 
-                fig.savefig(immpath + str(var_name) + "-" + str(n), dpi=800, transparent=True)
+                fig.savefig(immpath + str(var_name) + "-" + str(n), dpi=200, transparent=True)
                 plt.close(fig)
 
     def plot_online_data(self, frame_amplitude_predicted_sPOD, frame_amplitude_predicted_POD,
@@ -532,7 +532,7 @@ class wildfire2D_sup:
         subfig_b.supylabel(r"$T$")
         subfig_b.supxlabel(r"space $x$")
 
-        fig.savefig(impath + str(var_name) + "-mixed", dpi=800, transparent=True)
+        fig.savefig(impath + str(var_name) + "-mixed", dpi=300, transparent=True)
         plt.close(fig)
 
 
@@ -574,7 +574,7 @@ def plot_pred_comb(time_amplitudes_1_pred, time_amplitudes_1_test, time_amplitud
     ax3.plot(t, TA_POD_TEST[0, :], color="green", linestyle='-', label='actual')
     ax3.plot(t, POD_frame_amplitudes_predicted[0, :], color="black", linestyle='--', label='POD-NN')
     ax3.set_xticks([0, t[-1] / 2, t[-1]])
-    ax3.set_ylabel(r"$a_i^{k}(t,\mu)$")
+    ax3.set_ylabel(r"$a_i(t,\mu)$")
     ax3.set_xticklabels(["0s", r"$500s$", r"$1000s$"])
     ax3.set_xlabel(r"(c)")
     ax3.legend(loc='upper left')
@@ -593,15 +593,15 @@ def plot_pred_comb(time_amplitudes_1_pred, time_amplitudes_1_test, time_amplitud
     ax5.plot(t, shifts_interp[0][0][:Nt], color="blue", linestyle='--', label='sPOD-I')
     ax5.set_xticks([0, t[-1] / 2, t[-1]])
     ax5.set_xticklabels([r"$0s$", r"$500s$", r"$1000s$"])
-    ax5.set_ylabel(r"space $x$")
+    ax5.set_ylabel(r"shifts $\underline{\Delta}^k$")
     ax5.set_xlabel(r"(e)")
     ax5.grid()
     ax5.legend(loc='upper right')
 
     subfig_t.supxlabel(r"time $t$")
 
-    save_fig(filepath=impath + "all_comb_pred", figure=fig)
-    fig.savefig(impath + "all_comb_pred" + ".eps", format='eps', dpi=600, transparent=True)
+    save_fig(filepath=impath + "all_comb_pred_2D", figure=fig)
+    fig.savefig(impath + "all_comb_pred_2D" + ".pdf", format='pdf', dpi=200, transparent=True, bbox_inches="tight")
 
 
 def cartesian_to_polar(cartesian_data, X, Y, t, t_exact=None, fill_val=0):
