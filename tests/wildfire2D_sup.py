@@ -102,9 +102,9 @@ class wildfire2D_sup:
         # Apply srPCA on the data
         transform_list = [trafo_train_1, trafo_train_2]
         qmat = np.concatenate([np.reshape(q, newshape=[-1, self.Nt]) for q in q_polar], axis=1)
-        mu = np.prod(np.size(qmat, 0)) / (4 * np.sum(np.abs(qmat))) * 0.05
+        mu = np.prod(np.size(qmat, 0)) / (4 * np.sum(np.abs(qmat))) * 0.7
         lambd = 1 / np.sqrt(np.max([self.Nx, self.Ny]))
-        ret = shifted_rPCA(qmat, transform_list, nmodes_max=100, eps=1e-4, Niter=spod_iter, use_rSVD=True, mu=mu,
+        ret = shifted_rPCA(qmat, transform_list, nmodes_max=12, eps=1e-4, Niter=spod_iter, use_rSVD=True, mu=mu,
                            lambd=lambd)
         sPOD_frames_train, qtilde_train, rel_err_train = ret.frames, ret.data_approx, ret.rel_err_hist
         self.q_polar_train = qmat
@@ -164,9 +164,9 @@ class wildfire2D_sup:
         # Apply sPOD on the data
         transform_list = [trafo_test_1, trafo_test_2]
         qmat = np.reshape(q_polar, [-1, self.Nt])
-        mu = np.prod(np.size(qmat, 0)) / (4 * np.sum(np.abs(qmat))) * 0.05
+        mu = np.prod(np.size(qmat, 0)) / (4 * np.sum(np.abs(qmat))) * 0.7
         lambd = 1 / np.sqrt(np.max([self.Nx, self.Ny]))
-        ret = shifted_rPCA(qmat, transform_list, nmodes_max=100, eps=1e-4, Niter=spod_iter, use_rSVD=True, mu=mu,
+        ret = shifted_rPCA(qmat, transform_list, nmodes_max=12, eps=1e-4, Niter=spod_iter, use_rSVD=True, mu=mu,
                            lambd=lambd)
         sPOD_frames_test, qtilde_test, rel_err_test = ret.frames, ret.data_approx, ret.rel_err_hist
         self.q_polar_test = qmat
@@ -425,21 +425,27 @@ class wildfire2D_sup:
             err_full_interp))
         print("Relative reconstruction error indicator for full snapshot (cartesian) (POD-NN): {}".format(err_full_POD))
 
-        num1 = [np.abs(Q[:, :, 0, n].flatten() - Q_recon_sPOD_cart[:, :, 0, n].flatten()) for n in
-                range(Nt)]
-        den1 = np.sqrt(
-            sum([np.square(np.linalg.norm((Q[:, :, 0, n].flatten()))) for n in range(Nt)]) / Nt)
-        num2 = [np.abs(Q[:, :, 0, n].flatten() - Q_recon_POD_cart[:, :, 0, n].flatten()) for n in
-                range(Nt)]
-        den2 = np.sqrt(
-            sum([np.square(np.linalg.norm((Q[:, :, 0, n].flatten()))) for n in range(Nt)]) / Nt)
-        num3 = [np.abs(Q[:, :, 0, n].flatten() - Q_recon_interp_cart[:, :, 0, n].flatten()) for n in
-                range(Nt)]
-        den3 = np.sqrt(
-            sum([np.square(np.linalg.norm((Q[:, :, 0, n].flatten()))) for n in range(Nt)]) / Nt)
-        rel_err_sPOD_cart = [x / den1 for x in num1]
-        rel_err_POD_cart = [x / den2 for x in num2]
-        rel_err_interp_cart = [x / den3 for x in num3]
+        if test_type['typeOfTest'] != "query":
+            Q_diff_sPOD = np.concatenate([Q[:, :, 0, n].flatten('F') - Q_recon_sPOD_cart[:, :, 0, n].flatten('F')
+                                     for n in range(Nt)]).reshape(self.Nx * self.Ny, Nt, order='F')
+            Q_diff_POD = np.concatenate([Q[:, :, 0, n].flatten('F') - Q_recon_POD_cart[:, :, 0, n].flatten('F')
+                                          for n in range(Nt)]).reshape(self.Nx * self.Ny, Nt, order='F')
+            Q_diff_interp = np.concatenate([Q[:, :, 0, n].flatten('F') - Q_recon_interp_cart[:, :, 0, n].flatten('F')
+                                          for n in range(Nt)]).reshape(self.Nx * self.Ny, Nt, order='F')
+            Q_act = np.concatenate([Q[:, :, 0, n].flatten('F')
+                                    for n in range(Nt)]).reshape(self.Nx * self.Ny, Nt, order='F')
+            num1 = np.sqrt(np.einsum('ij,ij->j', Q_diff_sPOD, Q_diff_sPOD))
+            den1 = np.sqrt(np.sum(np.einsum('ij,ij->j', Q_act, Q_act)) / self.Nt)
+            num2 = np.sqrt(np.einsum('ij,ij->j', Q_diff_POD, Q_diff_POD))
+            num3 = np.sqrt(np.einsum('ij,ij->j', Q_diff_interp, Q_diff_interp))
+
+            rel_err_sPOD_cart = num1 / den1
+            rel_err_POD_cart = num2 / den1
+            rel_err_interp_cart = num3 / den1
+
+            errors = [rel_err_sPOD_cart, rel_err_POD_cart, rel_err_interp_cart]
+        else:
+            errors = [np.zeros(self.Nt), np.zeros(self.Nt), np.zeros(self.Nt)]
 
         if plot_online:
             # Plot the online prediction data
@@ -447,7 +453,6 @@ class wildfire2D_sup:
                            time_amplitudes_2_test, TA_INTERPOLATED, shifts_1_pred, SHIFTS_TEST, DELTA_PRED_FRAME_WISE,
                            frame_amplitude_predicted_POD, TA_POD_TEST, self.x, self.t)
 
-        errors = [rel_err_sPOD_cart, rel_err_POD_cart, rel_err_interp_cart]
 
         print('Timing...')
         print(

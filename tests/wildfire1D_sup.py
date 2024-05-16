@@ -77,10 +77,10 @@ class wildfire1D_sup:
 
         qmat = np.reshape(self.q_train, [-1, self.Nt * self.Nsamples_train])
         [N, M] = np.shape(qmat)
-        mu0 = N * M / (4 * np.sum(np.abs(qmat))) * 0.001
-        lambd0 = 1 / np.sqrt(np.maximum(M, N)) * 10
+        mu0 = N * M / (4 * np.sum(np.abs(qmat))) * 0.005
+        lambd0 = 1 / np.sqrt(np.maximum(M, N)) * 5
 
-        ret_train = shifted_rPCA(self.q_train, trafos_train, nmodes_max=60, eps=1e-16, Niter=spod_iter, use_rSVD=True,
+        ret_train = shifted_rPCA(self.q_train, trafos_train, nmodes_max=10, eps=1e-16, Niter=spod_iter, use_rSVD=True,
                                  mu=mu0, lambd=lambd0, dtol=1e-5)
         sPOD_frames_train, qtilde_train, rel_err_train = ret_train.frames, ret_train.data_approx, ret_train.rel_err_hist
 
@@ -146,9 +146,9 @@ class wildfire1D_sup:
         qmat = np.reshape(self.q_test, [-1, self.Nt])
         [N, M] = np.shape(qmat)
         mu0 = N * M / (4 * np.sum(np.abs(qmat))) * 0.001
-        lambd0 = 1 / np.sqrt(np.maximum(M, N)) * 10
+        lambd0 = 1 / np.sqrt(np.maximum(M, N)) * 5
 
-        ret_test = shifted_rPCA(self.q_test, trafos_test, nmodes_max=60, eps=1e-16, Niter=spod_iter, use_rSVD=True,
+        ret_test = shifted_rPCA(self.q_test, trafos_test, nmodes_max=5, eps=1e-16, Niter=spod_iter, use_rSVD=True,
                                 mu=mu0, lambd=lambd0, dtol=1e-5)
         sPOD_frames_test, qtilde_test, rel_err_test = ret_test.frames, ret_test.data_approx, ret_test.rel_err_hist
 
@@ -341,18 +341,25 @@ class wildfire1D_sup:
         print("Relative reconstruction error indicator for full snapshot (sPOD-I): {}".format(num1_i / den1_i))
         print("Relative reconstruction error indicator for full snapshot (POD-NN): {}".format(num2 / den2))
 
-        num1 = np.abs(self.q_test - Q_recon_sPOD)
-        den1 = np.sqrt(np.sum(np.square(np.linalg.norm(self.q_test, axis=0))) / self.Nt)
-        num2 = np.abs(self.q_test - Q_recon_POD)
-        den2 = np.sqrt(np.sum(np.square(np.linalg.norm(self.q_test, axis=0))) / self.Nt)
-        num3 = np.abs(self.q_test - QTILDE_FRAME_WISE)
-        den3 = np.sqrt(np.sum(np.square(np.linalg.norm(self.q_test, axis=0))) / self.Nt)
-        rel_err_sPOD = num1 / den1
-        rel_err_POD = num2 / den2
-        rel_err_interp = num3 / den3
+        if test_type['typeOfTest'] != "query":
+            one = self.q_test - Q_recon_sPOD
+            num1 = np.sqrt(np.einsum('ij,ij->j', one, one))
+            den1 = np.sqrt(np.sum(np.einsum('ij,ij->j', self.q_test, self.q_test)) / self.Nt)
 
-        errors = [rel_err_sPOD, rel_err_POD, rel_err_interp]
+            two = self.q_test - Q_recon_POD
+            num2 = np.sqrt(np.einsum('ij,ij->j', two, two))
 
+            three = self.q_test - QTILDE_FRAME_WISE
+            num3 = np.sqrt(np.einsum('ij,ij->j', three, three))
+
+            rel_err_sPOD = num1 / den1
+            rel_err_POD = num2 / den1
+            rel_err_interp = num3 / den1
+
+            errors = [rel_err_sPOD, rel_err_POD, rel_err_interp]
+        else:
+            errors = [np.zeros(self.Nt), np.zeros(self.Nt), np.zeros(self.Nt)]
+            
         if plot_online:
             if test_type['typeOfTest'] != "query":
                 plot_pred_comb(time_amplitudes_1_pred, time_amplitudes_1_test, time_amplitudes_2_pred,

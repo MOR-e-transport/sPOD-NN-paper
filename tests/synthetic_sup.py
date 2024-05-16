@@ -282,17 +282,24 @@ class synthetic_sup:
         print("Relative reconstruction error indicator for full snapshot (sPOD-I) is {}".format(num3 / den3))
         print("Relative reconstruction error indicator for full snapshot (POD-NN) is {}".format(num2 / den2))
 
-        num1 = np.abs(self.q_test - q_sPOD_recon)
-        den1 = np.sqrt(np.sum(np.square(np.linalg.norm(self.q_test, axis=0))) / self.Nt)
-        num2 = np.abs(self.q_test - q_POD_recon)
-        den2 = np.sqrt(np.sum(np.square(np.linalg.norm(self.q_test, axis=0))) / self.Nt)
-        num3 = np.abs(self.q_test - q_interp)
-        den3 = np.sqrt(np.sum(np.square(np.linalg.norm(self.q_test, axis=0))) / self.Nt)
-        rel_err_sPOD = num1 / den1
-        rel_err_POD = num2 / den2
-        rel_err_interp = num3 / den3
+        if test_type['typeOfTest'] != "query":
+            one = self.q_test - q_sPOD_recon
+            num1 = np.sqrt(np.einsum('ij,ij->j', one, one))
+            den1 = np.sqrt(np.sum(np.einsum('ij,ij->j', self.q_test, self.q_test)) / self.Nt)
 
-        errors = [rel_err_sPOD, rel_err_POD, rel_err_interp]
+            two = self.q_test - q_POD_recon
+            num2 = np.sqrt(np.einsum('ij,ij->j', two, two))
+
+            three = self.q_test - q_interp
+            num3 = np.sqrt(np.einsum('ij,ij->j', three, three))
+
+            rel_err_sPOD = num1 / den1
+            rel_err_POD = num2 / den1
+            rel_err_interp = num3 / den1
+
+            errors = [rel_err_sPOD, rel_err_POD, rel_err_interp]
+        else:
+            errors = [np.zeros(self.Nt), np.zeros(self.Nt), np.zeros(self.Nt)]
 
         if plot_online:
             # Plot the online prediction data
